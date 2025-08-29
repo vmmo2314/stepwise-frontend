@@ -1,0 +1,58 @@
+/* appointment-response.css */
+
+/* ===== Paleta con variables: se ajusta a tu plantilla Bootstrap si ya cambiaste --bs-* ===== */
+:root {
+  /* Si tu plantilla ya define estas, se usarán automáticamente */
+  --brand-primary: var(--bs-primary, #0ea5e9);
+  --brand-success: var(--bs-success, #10b981);
+  --brand-warning: var(--bs-warning, #f59e0b);
+  --brand-danger: var(--bs-danger, #ef4444);
+  --brand-info: var(--bs-info, #3b82f6);
+}
+
+/* Gradiente para headers */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, color-mix(in oklab, var(--brand-primary) 85%, #fff 15%), var(--brand-info));
+}
+
+/* Tarjetas con ligero lift al hover (no intrusivo) */
+.card-lift { transition: transform .25s ease, box-shadow .25s ease; }
+.card-lift:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,0,0,.08); }
+
+/* Buscador & selects: microinteracciones seguras */
+.search-input { transition: box-shadow .2s ease, transform .2s ease; }
+.search-input:focus { transform: scale(1.01); box-shadow: 0 0 0 .25rem color-mix(in oklab, var(--brand-info) 20%, transparent); }
+.filter-select { transition: transform .2s ease; }
+.filter-select:hover { transform: translateY(-1px); }
+
+/* Badges animadas */
+.badge-bounce { animation: badgeBounce 2s infinite; }
+@keyframes badgeBounce {
+  0%,20%,53%,80%,100% { transform: translateY(0); }
+  40%,43% { transform: translateY(-4px); }
+  70% { transform: translateY(-2px); }
+  90% { transform: translateY(-1px); }
+}
+.badge-glow { animation: badgeGlow 2.5s ease-in-out infinite alternate; }
+@keyframes badgeGlow {
+  0% { box-shadow: 0 0 0 rgba(0,0,0,0); }
+  100% { box-shadow: 0 0 14px color-mix(in oklab, var(--brand-primary) 45%, transparent); }
+}
+
+/* Aparición progresiva de ítems */
+.animate-slide-in { animation: slideInUp .45s ease-out forwards; opacity: 0; transform: translateY(10px); }
+@keyframes slideInUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Estado de tarjeta al hover */
+.appointment-card { transition: transform .25s ease, box-shadow .25s ease; }
+.appointment-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(0,0,0,.08); }
+.appointment-card.animating { animation: pulse 1s ease-in-out; }
+@keyframes pulse { 0%{transform:scale(1)} 50%{transform:scale(1.02)} 100%{transform:scale(1)} }
+
+/* Overlay de éxito tenue (accesible) */
+.success-overlay { position: fixed; inset: 0; background: color-mix(in oklab, var(--brand-success) 12%, transparent); z-index: 1055; animation: successFlash 1.6s ease-out; }
+@keyframes successFlash { 0%{opacity:0} 50%{opacity:1} 100%{opacity:0} }
+
+/* Utilidades menores */
+.btn-hover-scale { transition: transform .2s ease, box-shadow .2s ease; }
+.btn-hover-scale:hover { transform: scale(1.03); box-shadow: 0 6px 18px rgba(0,0,0,.12); }

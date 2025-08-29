@@ -1,0 +1,83 @@
+/* Estilos para el componente sticky */
+.sticky-patient-info {
+  opacity: 0;
+
+}
+
+.sticky-patient-info.floating-active {
+  cursor: pointer;
+}
+
+.sticky-patient-info.floating-active:hover {
+  transform: translateX(-50%) scale(1.03) !important;
+}
+
+/* Animación de entrada suave */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+.sticky-patient-info.floating-active {
+  animation: slideInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efecto de pulso sutil para llamar la atención */
+.sticky-patient-info.floating-active::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, 
+    rgba(59, 130, 246, 0.1),
+    rgba(147, 51, 234, 0.1),
+    rgba(59, 130, 246, 0.1)
+  );
+  border-radius: 18px;
+  z-index: -1;
+  opacity: 0;
+  animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.02); }
+}
+
+/* Mejoras para dispositivos móviles */
+@media (max-width: 768px) {
+  .sticky-patient-info.floating-active {
+    bottom: 10px;
+    margin: 0 10px;
+    max-width: calc(100vw - 20px);
+  }
+}
+
+/* Mejoras para la accesibilidad */
+.sticky-patient-info:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Transición suave para cambios de tema */
+.sticky-patient-info * {
+  transition: color 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+}
+
+/* Estilos específicos para tema oscuro */
+[data-theme-version="dark"] .sticky-patient-info.floating-active {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Estilos específicos para tema claro */
+[data-theme-version="light"] .sticky-patient-info.floating-active {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+}

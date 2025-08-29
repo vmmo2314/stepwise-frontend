@@ -1,0 +1,344 @@
+/* ================================
+   TABLA DE PACIENTES - ESTILOS CORREGIDOS
+   ================================ */
+
+/* Contenedor principal de la tabla */
+.patient-table-container {
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+/* Resetear estilos de Bootstrap que causan conflictos */
+.patient-table {
+  margin-bottom: 0 !important;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Header de la tabla */
+.patient-table thead th {
+  padding: 1rem 1.5rem;
+  border: none;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #495057;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Filas del cuerpo */
+.patient-table tbody tr {
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.patient-table tbody tr:hover .patient-id,
+.patient-table tbody tr:hover .patient-doctor {
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.patient-table tbody tr:hover {
+  background: rgba(0, 123, 255, 0.05) !important;
+  box-shadow: inset 3px 0 0 #28a745;
+  /* transform: translateX(2px); */ /* <-- quita esto */
+}
+
+/* Estado seleccionado */
+.patient-table tbody tr.selected {
+  background: rgba(40, 167, 69, 0.08) !important;
+  border-left: 4px solid #28a745;
+  position: relative;
+}
+
+.patient-table tbody tr.selected::after {
+  content: none;
+}
+
+/* ===== Selección de fila con el MISMO efecto que la barra de búsqueda (REEMPLAZA ESTE BLOQUE) ===== */
+.patient-table tbody tr.selected {
+  position: relative;
+  border-left: 4px solid #28a745; /* igual que el input */
+  border-radius: 12px;            /* ajusta al radio de tu tabla */
+  overflow: hidden;               /* para contener el halo */
+  transition: border-color 0.3s ease;
+}
+
+/* Halo degradado animado, idéntico al .search-border-animation */
+.patient-table tbody tr.selected::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;            /* mismo radio que el tr */
+  pointer-events: none;
+  z-index: 1;
+  background: linear-gradient(135deg, #28a745, #20c997);
+  background-size: 200% 200%;
+  opacity: 0.10;                  /* misma opacidad que en el input */
+  animation: gradientShift 2s ease infinite; /* usamos la MISMA animación */
+}
+
+/* (Si aún tienes esto) elimina cualquier animación previa tipo pulso */
+/* @keyframes glowPulse { ... }  y .patient-table tbody tr.selected { animation: glowPulse ... } */
+
+span.selected-tag {
+    position: absolute;
+}
+
+.selected-tag {
+  background: #28a745;
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  border-radius: 12px;
+  margin-left: 6px;
+  min-width: 45px; /* fija ancho para evitar saltos */
+  text-align: center;
+  visibility: hidden;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: all 0.3s ease-in;
+  display: inline-block;
+}
+
+.selected-tag.visible {
+  visibility: visible;
+  opacity: 1;
+  transform: scale(1);
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+
+/* Nuevo paciente */
+.patient-table tbody tr.new-patient {
+  background: rgba(40, 167, 69, 0.1) !important;
+  border-left: 4px solid #28a745;
+  animation: slideIn 0.6s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Celdas */
+.patient-table tbody td {
+  padding: 1rem 1.5rem;
+  border: none;
+  vertical-align: middle;
+}
+
+/* Estilos específicos para cada tipo de celda */
+
+.patient-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #28a745;
+}
+
+.patient-email {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+.patient-doctor {
+  background: rgba(0, 123, 255, 0.1);
+  color: #28a745;
+  font-weight: 500;
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.875rem;
+  display: inline-block;
+}
+
+.patient-visit {
+  color: #6c757d;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+/* Efectos hover para elementos específicos */
+.patient-table tbody tr:hover .patient-id {
+  background: #28a745;
+  color: white;
+}
+
+.patient-table tbody tr:hover .patient-doctor {
+  background: rgba(0, 123, 255, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .patient-table thead th,
+  .patient-table tbody td {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .patient-doctor,
+  .patient-visit {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  
+  .patient-table thead th,
+  .patient-table tbody td {
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .patient-id {
+    font-size: 0.75rem;
+    min-width: 60px;
+  }
+}
+
+/* Eliminar bordes innecesarios */
+.patient-table thead th:first-child {
+  border-top-left-radius: 12px;
+}
+
+.patient-table thead th:last-child {
+  border-top-right-radius: 12px;
+}
+
+.patient-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 12px;
+}
+
+.patient-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 12px;
+}
+
+/* Scroll personalizado para tabla responsive */
+.table-responsive::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: #f8f9fa;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #dee2e6;
+  border-radius: 3px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: #adb5bd;
+}
+
+/* Asegurar que no haya conflictos con otros estilos */
+.patient-table-container .table-responsive {
+  border-radius: 0;
+  border: none;
+}
+
+/* Estados de foco para accesibilidad */
+.patient-table tbody tr:focus {
+  outline: 2px solid #28a745;
+  outline-offset: -2px;
+}
+
+/* Mejorar la alineación del texto */
+.patient-table tbody td {
+  text-align: left;
+}
+
+.patient-table thead th {
+  text-align: left;
+}
+
+/* Activar scroll en móviles */
+@media (max-width: 768px) {
+  .table-responsive {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (max-width: 768px) {
+  .patient-table tbody tr:active,
+  .patient-table tbody tr:focus-within {
+    background: rgba(0, 123, 255, 0.08) !important;
+    box-shadow: inset 3px 0 0 #28a745;
+  }
+
+  /* Asegurar que Nombre, Doctor y Última Visita se muestren */
+  .patient-table thead th:nth-child(2),
+  .patient-table tbody td:nth-child(2),
+  .patient-table thead th:nth-child(5),
+  .patient-table tbody td:nth-child(5) {
+    display: table-cell;
+  }
+
+  /* Ajustar padding para mejor uso del espacio */
+  .patient-table thead th,
+  .patient-table tbody td {
+    padding: 1rem 1.25rem; /* + espacio vertical */
+    font-size: 0.9rem;
+    line-height: 1.4;
+    vertical-align: middle;
+  }
+  
+  /* Hacer más compactos los elementos en móviles */
+  .patient-name,
+  .patient-doctor,
+  .patient-visit {
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .patient-name {
+    font-size: 1rem;
+  }
+
+  /* Ajustar anchos de columna para mejor distribución */
+  .patient-table thead th:nth-child(2),
+  .patient-table tbody td:nth-child(2) {
+    width: 40%; /* Nombre más ancho */
+  }
+  
+  .patient-table thead th:nth-child(4),
+  .patient-table tbody td:nth-child(4) {
+    width: 30%; /* Doctor */
+  }
+  
+  .patient-table thead th:nth-child(5),
+  .patient-table tbody td:nth-child(5) {
+    width: 30%; /* Última Visita */
+  }
+
+  .patient-table tbody tr:active .patient-id,
+  .patient-table tbody tr:active .patient-doctor {
+    background: #007bff;
+    color: white;
+  }
+    .patient-table thead th:nth-child(1),
+    .patient-table tbody td:nth-child(1) {
+        display: none;
+    }
+}
+
+/* Estilos generales (pantallas grandes, por defecto) */
+.patient-table thead th:nth-child(3),
+.patient-table tbody td:nth-child(3) {
+  display: none; /* Ocultar Correo SIEMPRE */
+}
+

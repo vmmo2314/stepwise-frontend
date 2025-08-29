@@ -1,0 +1,49 @@
+# Dependencias
+/node_modules
+/.pnp
+.pnp.js
+
+# Archivos de producción
+/dist
+/build
+
+# Archivos de configuración locales
+.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Cache
+/.vite
+/.cache
+/.parcel-cache
+/.next
+/.nuxt
+/.output
+/.vercel
+/.turbo
+/.eslintcache
+
+# IDEs y editores
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Otros
+/package-lock.json
+yarn.lock
+pnpm-lock.yaml

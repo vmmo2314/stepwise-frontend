@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es-MX">
+  <head>
+    <!-- Básicos -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Título -->
+    <title>Stepwise — Plataforma de análisis de pisada y panel clínico</title>
+
+    <!-- Favicon (ICO generado) -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="any" />
+
+    <!-- Color del tema (auto clarea en light y oscurece en dark) -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b1220" />
+
+    <!-- Descripción -->
+    <meta
+      name="description"
+      content="Stepwise es una plataforma para análisis de pisada y gestión clínica con panel para profesionales de la salud."
+    />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Stepwise — Plataforma de análisis de pisada y panel clínico" />
+    <meta
+      property="og:description"
+      content="Análisis de pisada, recomendaciones personalizadas y panel clínico en un solo lugar."
+    />
+    <!-- Puedes sustituir esta imagen por la tuya en /public/og-image.png -->
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:site_name" content="Stepwise" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Stepwise — Plataforma de análisis de pisada y panel clínico" />
+    <meta
+      name="twitter:description"
+      content="Análisis de pisada, recomendaciones personalizadas y panel clínico en un solo lugar."
+    />
+    <meta name="twitter:image" content="/og-image.png" />
+
+    <!-- Manifest (opcional si usas PWA) -->
+    <!-- <link rel="manifest" href="/manifest.webmanifest" /> -->
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <!-- Entrada Vite/React -->
+    <script type="module" src="/src/main.jsx"></script>
+
+    <!-- MediaPipe Pose (déjalo si lo necesitas realmente) -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose"></script>
+  </body>
+</html>
