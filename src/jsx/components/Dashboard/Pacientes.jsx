@@ -192,12 +192,6 @@ const PatientList = ({ onSelectPatient }) => {
             </p>
           </div>
         </div>
-        <button
-          className="btn btn-primary btn-lg px-4 py-2 rounded-3 shadow-sm hover-lift"
-          onClick={() => setShowModal(true)}
-        >
-          <UserPlus size={18} className="me-2" /> Añadir Paciente
-        </button>
       </div>
 
       <div className="patient-table-container">

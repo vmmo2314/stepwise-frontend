@@ -186,26 +186,70 @@ class AppointmentResponseWindow extends Component {
     this.setState({ alternativeDates: dates });
   };
 
+  resolveCurrentDoctor = () => {
+    // 1) intenta por props (si usas algún AuthProvider)
+    const p = this.props?.currentDoctor || this.props?.doctor || null;
+
+    // 2) intenta por estado local si existiera
+    const s = this.state?.currentDoctor || null;
+
+    // 3) intenta por localStorage (ajusta claves a tu app)
+    let ls = null;
+    try {
+      ls =
+        JSON.parse(localStorage.getItem("userProfile")) ||
+        JSON.parse(localStorage.getItem("authUser")) ||
+        null;
+    } catch (_) {}
+
+    // normaliza posibles fuentes
+    const pickName = (o) =>
+      o?.displayName ||
+      o?.name ||
+      [o?.firstName, o?.lastName].filter(Boolean).join(" ") ||
+      undefined;
+
+    const pickId = (o) => o?.uid || o?.id || o?._id || undefined;
+
+    const doctorId =
+      pickId(p) ?? pickId(s) ?? pickId(ls) ?? this.state?.selectedAppointment?.doctorId;
+
+    const doctorName =
+      pickName(p) ?? pickName(s) ?? pickName(ls);
+
+    return { doctorId, doctorName };
+  };
+
   confirmAcceptAppointment = async () => {
     const { selectedAppointment, doctorNotes } = this.state;
     this.setState({ isProcessing: true });
 
     try {
+      // Podemos intentar obtenerlos, pero NO bloqueamos si no existen
+      const { doctorId, doctorName } = this.resolveCurrentDoctor();
+
       const updated = await acceptAppointment({
         appointmentId: selectedAppointment.id,
-        doctorNotes
+        doctorNotes,
+        // Solo se envían si existen (el backend ya puede resolverlos solo)
+        ...(doctorId ? { doctorId } : {}),
+        ...(doctorName ? { doctorName } : {}),
       });
 
-      this.setState(prev => ({
-        pendingAppointments: prev.pendingAppointments.map(a =>
-          a.id === updated.id ? updated : a
-        ),
-        showResponseModal: false,
-        isProcessing: false,
-        showSuccessAnimation: true
-      }), () => this.hideSuccessAfter(1200));
+      this.setState(
+        (prev) => ({
+          pendingAppointments: prev.pendingAppointments.map((a) =>
+            a.id === updated.id ? updated : a
+          ),
+          showResponseModal: false,
+          isProcessing: false,
+          showSuccessAnimation: true,
+        }),
+        () => this.hideSuccessAfter(1200)
+      );
 
       Swal.fire("¡Cita confirmada!", "La cita fue aceptada correctamente", "success");
+      this.triggerRowAnimation(selectedAppointment.id, "accept");
     } catch (e) {
       this.setState({ isProcessing: false });
       Swal.fire("Error", e, "error");

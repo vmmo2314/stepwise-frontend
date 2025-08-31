@@ -113,9 +113,7 @@ const PersonalRecommendations = ({
 
     setIsLoading(true);
     try {
-      console.log('🔍 Cargando recomendaciones para:', { patientId: effectivePatientId, analysisId: effectiveAnalysisId });
       const response = await getPersonalRecommendations(effectivePatientId, analysisIdToUse);
-      console.log('📥 Respuesta del backend:', response);
 
       const ts = response?.personalRecommendations?.timestamp ?? response?.timestamp ?? null;
 
@@ -312,33 +310,57 @@ const PersonalRecommendations = ({
 
   ////////////////////// =================== Helpers =================== //////////////////////
   const lastLabelResolved = useMemo(() => {
+    // 1) Prioriza la fecha del análisis seleccionado, luego la de la API, luego la propia del PR
     const ts =
-      recommendations?.timestamp ??
-      apiRecommendations?.timestamp ??
       analysisTimestamp ??
+      apiRecommendations?.timestamp ??
+      recommendations?.timestamp ??
       null;
 
-    if (ts) {
+    // Normaliza distintos tipos de timestamp
+    const toDateObj = (val) => {
+      if (!val) return null;
+
+      if (typeof val === "number") {
+        // Heurística: >1e12 => ms, si no => segundos
+        return new Date(val > 1e12 ? val : val * 1000);
+      }
+      if (val?.seconds ?? val?._seconds) {
+        const s = val.seconds ?? val._seconds;
+        const n = typeof s === "number" ? s : Number(s);
+        return Number.isFinite(n) ? new Date(n * 1000) : null;
+      }
+      const d = new Date(String(val));
+      return Number.isNaN(d.getTime()) ? null : d;
+    };
+
+    const d = toDateObj(ts);
+    if (d) {
       try {
-        if (typeof ts === "number") {
-          return new Date(ts).toLocaleString("es-MX");
-        }
-        if (ts?.seconds ?? ts?._seconds) {
-          const s = ts.seconds ?? ts._seconds;
-          return new Date(s * 1000).toLocaleString("es-MX");
-        }
-        const d = new Date(String(ts));
-        if (!Number.isNaN(d.getTime())) return d.toLocaleString("es-MX");
-      } catch { /* ignore */ }
+        // ✅ Formato CDMX, sin segundos ni zona (“GMT-6”), 12h con a. m./p. m.
+        return d.toLocaleString("es-MX", {
+          timeZone: "America/Mexico_City",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+          // OJO: NO incluir timeZoneName para evitar “GMT-6”
+        });
+      } catch {
+        // Fallback simple sin segundos
+        return `${d.toLocaleDateString("es-MX")} ${d.toLocaleTimeString("es-MX", { hour: "numeric", minute: "2-digit", hour12: true })}`;
+      }
     }
 
     // Fallback: parte del ID del análisis resuelto
     const anyId = effectiveAnalysisId ?? analysisIdToUse ?? null;
     return anyId ? `ID: ${String(anyId).slice(0, 10)}…` : "—";
   }, [
-    recommendations?.timestamp,
-    apiRecommendations?.timestamp,
     analysisTimestamp,
+    apiRecommendations?.timestamp,
+    recommendations?.timestamp,
     effectiveAnalysisId,
     analysisIdToUse,
   ]);
@@ -577,7 +599,7 @@ const PersonalRecommendations = ({
 
           {!readOnly && (
             <div className="d-flex align-items-center gap-2 ms-md-auto">
-              <span className="small text-white-50 text-nowrap">Último análisis</span>
+              <span className="small text-white-50 text-nowrap">Fecha del análisis</span>
 
               <div
                 className="d-flex align-items-center justify-content-end"

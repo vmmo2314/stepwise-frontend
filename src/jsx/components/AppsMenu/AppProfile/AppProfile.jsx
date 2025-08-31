@@ -41,17 +41,29 @@ const PatientProfileCompletion = () => {
     // Datos personales
     edad: "",
     sexo: "",
+    
+    // Datos médicos básicos
     tipo_sangre: "",
     peso_kg: "",
     estatura_cm: "",
     IMC: "",
-    // Info contacto
+    
+    // Información médica importante
+    alergias: "",
+    medicamentos_actuales: "",
+    enfermedades_cronicas: "",
+    antecedentes_familiares: "",
+    cirugias_previas: "",
+    vacunas: "",
+    
+    // Información de contacto
     telefono: "",
+    telefono_emergencia: "",
     direccion: "",
-    // Médicos (solo para pacientes)
-    diagnostico_principal: "",
-    condiciones_asociadas: "",
-    // Doctor específico
+    contacto_emergencia: "",
+    relacion_contacto_emergencia: "",
+    
+    // Datos profesionales (para médicos)
     especialidad: "",
     cedula_profesional: "",
   })
@@ -71,16 +83,32 @@ const PatientProfileCompletion = () => {
         if (profile) {
           if (rol === "paciente") {
             setFormData({
+              // Datos personales
               edad: profile.datos_personales?.edad || "",
               sexo: profile.datos_personales?.sexo || "",
-              tipo_sangre: profile.datos_personales?.tipo_sangre || "",
+              
+              // Datos básicos y medidas
               peso_kg: profile.datos_personales?.peso_kg || "",
               estatura_cm: profile.datos_personales?.estatura_cm || "",
               IMC: profile.datos_personales?.IMC || "",
+              
+              // Datos médicos
+              tipo_sangre: profile.datos_medicos?.tipo_sangre || "",
+              
+              // Información médica importante
+              alergias: profile.datos_medicos?.alergias || "",
+              medicamentos_actuales: profile.datos_medicos?.medicamentos_actuales || "",
+              enfermedades_cronicas: profile.datos_medicos?.enfermedades_cronicas || "",
+              antecedentes_familiares: profile.datos_medicos?.antecedentes_familiares || "",
+              cirugias_previas: profile.datos_medicos?.cirugias_previas || "",
+              vacunas: profile.datos_medicos?.vacunas || "",
+              
+              // Información de contacto
               telefono: profile.info_contacto?.telefono || "",
+              telefono_emergencia: profile.info_contacto?.telefono_emergencia || "",
               direccion: profile.info_contacto?.direccion || "",
-              diagnostico_principal: profile.diagnostico_principal || "",
-              condiciones_asociadas: profile.condiciones_asociadas || "",
+              contacto_emergencia: profile.info_contacto?.contacto_emergencia || "",
+              relacion_contacto_emergencia: profile.info_contacto?.relacion_contacto_emergencia || "",
             })
           } else if (rol === "doctor") {
             setFormData({
@@ -113,15 +141,20 @@ const PatientProfileCompletion = () => {
         [name]: value,
       }
 
-      // Calcular IMC automáticamente
+      // Convertir campos numéricos
       if (name === "peso_kg" || name === "estatura_cm") {
+        updatedFormData[name] = value === "" ? "" : Number.parseFloat(value)
+        
+        // Calcular IMC automáticamente
         const peso = name === "peso_kg" ? Number.parseFloat(value) : Number.parseFloat(prev.peso_kg)
         const estatura = name === "estatura_cm" ? Number.parseFloat(value) : Number.parseFloat(prev.estatura_cm)
 
-        if (peso > 0 && estatura > 0) {
+        if (!isNaN(peso) && !isNaN(estatura) && peso > 0 && estatura > 0) {
           const estaturaM = estatura / 100
           const imc = (peso / (estaturaM * estaturaM)).toFixed(2)
           updatedFormData.IMC = imc
+        } else {
+          updatedFormData.IMC = ""
         }
       }
 
@@ -161,18 +194,26 @@ const PatientProfileCompletion = () => {
           }
         } else if (formType === "medical") {
           updateData = {
-            datos_personales: {
-              ...profileData?.datos_personales,
+            datos_medicos: {
               tipo_sangre: formData.tipo_sangre,
-            },
-            diagnostico_principal: formData.diagnostico_principal,
-            condiciones_asociadas: formData.condiciones_asociadas,
+              alergias: formData.alergias,
+              medicamentos_actuales: formData.medicamentos_actuales,
+              enfermedades_cronicas: formData.enfermedades_cronicas,
+              antecedentes_familiares: formData.antecedentes_familiares,
+              cirugias_previas: formData.cirugias_previas,
+              vacunas: formData.vacunas,
+              diagnostico_principal: formData.diagnostico_principal,
+              condiciones_asociadas: formData.condiciones_asociadas
+            }
           }
         } else if (formType === "contact") {
           updateData = {
             info_contacto: {
               telefono: formData.telefono,
+              telefono_emergencia: formData.telefono_emergencia,
               direccion: formData.direccion,
+              contacto_emergencia: formData.contacto_emergencia,
+              relacion_contacto_emergencia: formData.relacion_contacto_emergencia
             },
           }
         }
@@ -216,8 +257,20 @@ const PatientProfileCompletion = () => {
   const getCompletionStatus = () => {
     if (rol === "paciente") {
       const personalComplete = formData.edad && formData.sexo && formData.peso_kg && formData.estatura_cm
-      const medicalComplete = formData.tipo_sangre && formData.diagnostico_principal
-      const contactComplete = formData.telefono && formData.direccion
+      const medicalComplete = formData.tipo_sangre && 
+                            formData.alergias && 
+                            formData.medicamentos_actuales && 
+                            formData.enfermedades_cronicas && 
+                            formData.antecedentes_familiares && 
+                            formData.cirugias_previas && 
+                            formData.vacunas
+      const contactComplete = rol === "paciente" 
+        ? formData.telefono && 
+          formData.direccion && 
+          formData.telefono_emergencia && 
+          formData.contacto_emergencia && 
+          formData.relacion_contacto_emergencia
+        : formData.telefono && formData.direccion
 
       const completedSections = [personalComplete, medicalComplete, contactComplete].filter(Boolean).length
       const totalSections = 3
@@ -272,33 +325,6 @@ const PatientProfileCompletion = () => {
           <div className="card border-0 shadow-sm">
             <div className="card-body p-4">
               <div className="row align-items-center gy-3">
-                {/* Imagen de perfil */}
-                <div className="col-auto mx-auto mx-sm-0">
-                  <div
-                    className="position-relative"
-                    style={{ width: "clamp(64px, 18vw, 80px)", height: "clamp(64px, 18vw, 80px)" }}
-                  >
-                    <img
-                      src={profileImage || "/placeholder.svg"}
-                      className="rounded-circle border border-3 border-light shadow w-100 h-100 img-fluid"
-                      alt="Foto de perfil del usuario"
-                      style={{ objectFit: "cover" }}
-                    />
-                    <button
-                      className="btn btn-primary btn-sm position-absolute rounded-circle d-flex align-items-center justify-content-center"
-                      style={{
-                        width: "24px",
-                        height: "24px",
-                        bottom: "0",
-                        right: "0",
-                        transform: "translate(25%, 25%)",
-                      }}
-                      onClick={() => dispatch({ type: "profilePhoto" })}
-                    >
-                      <i className="fas fa-camera" style={{ fontSize: "12px" }}></i>
-                    </button>
-                  </div>
-                </div>
 
                 {/* Información principal */}
                 <div className="col-12 col-sm">
@@ -351,9 +377,9 @@ const PatientProfileCompletion = () => {
                     </span>
                     <div className="flex-grow-1">
                       <h6 className="mb-1 text-dark">Datos Personales</h6>
-                      <p className="mb-2 small text-muted">Edad, sexo, peso, estatura</p>
+                      <p className="mb-2 small text-muted">Complete su información básica: edad, sexo, peso y estatura</p>
                       <Button variant="primary" size="sm" onClick={() => dispatch({ type: "personalInfoModal" })}>
-                        Completar
+                        {formData.edad || formData.sexo || formData.peso_kg || formData.estatura_cm ? 'Completar Faltantes' : 'Completar'}
                       </Button>
                     </div>
                   </div>
@@ -364,7 +390,7 @@ const PatientProfileCompletion = () => {
 
           {!completionStatus.medical && (
             <div className="col-xl-4 col-lg-6 col-sm-6 mb-3">
-              <div className="card border-0 shadow-sm h-100 bg-light">
+              <div className="card border-0 shadow-sm bg-light">
                 <div className="card-body p-4">
                   <div className="d-flex align-items-center">
                     <span
@@ -373,11 +399,12 @@ const PatientProfileCompletion = () => {
                     >
                       <i className="fas fa-notes-medical"></i>
                     </span>
+                    
                     <div className="flex-grow-1">
                       <h6 className="mb-1 text-dark">Info. Médica</h6>
-                      <p className="mb-2 small text-muted">Tipo sangre, diagnóstico</p>
+                      <p className="mb-2 small text-muted">Historial médico completo, alergias, medicamentos y más</p>
                       <Button variant="warning" size="sm" onClick={() => dispatch({ type: "medicalInfoModal" })}>
-                        Completar
+                        {formData.tipo_sangre || formData.alergias || formData.medicamentos_actuales ? 'Completar Faltantes' : 'Completar'}
                       </Button>
                     </div>
                   </div>
@@ -388,7 +415,7 @@ const PatientProfileCompletion = () => {
 
           {!completionStatus.contact && (
             <div className="col-xl-4 col-lg-6 col-sm-6 mb-3">
-              <div className="card border-0 shadow-sm h-100 bg-light">
+              <div className="card border-0 shadow-sm bg-light">
                 <div className="card-body p-4">
                   <div className="d-flex align-items-center">
                     <span
@@ -399,9 +426,9 @@ const PatientProfileCompletion = () => {
                     </span>
                     <div className="flex-grow-1">
                       <h6 className="mb-1 text-dark">Contacto</h6>
-                      <p className="mb-2 small text-muted">Teléfono, dirección</p>
+                      <p className="mb-2 small text-muted">Contacto personal y de emergencia</p>
                       <Button variant="secondary" size="sm" onClick={() => dispatch({ type: "contactInfoModal" })}>
-                        Completar
+                        {formData.telefono || formData.direccion || formData.telefono_emergencia ? 'Completar Faltantes' : 'Completar'}
                       </Button>
                     </div>
                   </div>
@@ -428,7 +455,7 @@ const PatientProfileCompletion = () => {
           {!completionStatus.professional && (
             <div className="col-xl-4 col-lg-6 col-sm-6 mb-3">
               <div
-                className="card border-0 shadow-sm h-100"
+                className="card border-0 shadow-sm"
                 style={{ background: "linear-gradient(135deg, #28a745, #20c997)" }}
               >
                 <div className="card-body p-4">
@@ -521,7 +548,8 @@ const PatientProfileCompletion = () => {
                   )}
                   <Nav.Item>
                     <Nav.Link eventKey="Contact">
-                      <i className="fas fa-address-book me-2"></i>Contacto
+                      <i className="fas fa-address-book me-2"></i>
+                      {rol === "paciente" ? "Contacto Personal y Emergencia" : "Contacto Profesional"}
                     </Nav.Link>
                   </Nav.Item>
                 </Nav>
@@ -663,26 +691,44 @@ const PatientProfileCompletion = () => {
                         <div className="col-md-8">
                           <h5 className="text-dark mb-3">Información Médica</h5>
                           <div className="row g-3">
-                            <div className="col-12">
-                              <div className="border rounded p-3 bg-light">
-                                <small className="text-muted d-block">Tipo de Sangre</small>
-                                <strong className="text-dark">{formData.tipo_sangre || "No especificado"}</strong>
+                            {/* Datos médicos básicos */}
+                            <div className="col-md-6">
+                              <div className="border rounded p-3 bg-light h-100">
+                                <h6 className="text-primary mb-3">Datos Básicos</h6>
+                                <small className="text-muted d-block mb-2">Tipo de Sangre</small>
+                                <strong className="text-dark d-block">{formData.tipo_sangre || "No especificado"}</strong>
+                                <small className="text-muted d-block mt-3 mb-2">Peso</small>
+                                <strong className="text-dark d-block">{formData.peso_kg ? `${formData.peso_kg} kg` : "No especificado"}</strong>
+                                <small className="text-muted d-block mt-3 mb-2">Estatura</small>
+                                <strong className="text-dark d-block">{formData.estatura_cm ? `${formData.estatura_cm} cm` : "No especificado"}</strong>
+                                <small className="text-muted d-block mt-3 mb-2">IMC</small>
+                                <strong className="text-dark d-block">{formData.IMC || "No calculado"}</strong>
                               </div>
                             </div>
-                            <div className="col-12">
-                              <div className="border rounded p-3 bg-light">
-                                <small className="text-muted d-block">Diagnóstico Principal</small>
-                                <strong className="text-dark">
-                                  {formData.diagnostico_principal || "No especificado"}
-                                </strong>
+                            
+                            {/* Alergias y medicamentos */}
+                            <div className="col-md-6">
+                              <div className="border rounded p-3 bg-light h-100">
+                                <h6 className="text-danger mb-3">Alergias y Medicamentos</h6>
+                                <small className="text-muted d-block mb-2">Alergias</small>
+                                <strong className="text-dark d-block">{formData.alergias || "No especificadas"}</strong>
+                                <small className="text-muted d-block mt-3 mb-2">Medicamentos Actuales</small>
+                                <strong className="text-dark d-block">{formData.medicamentos_actuales || "Ninguno registrado"}</strong>
                               </div>
                             </div>
+                            
+                            {/* Historial médico */}
                             <div className="col-12">
                               <div className="border rounded p-3 bg-light">
-                                <small className="text-muted d-block">Condiciones Asociadas</small>
-                                <strong className="text-dark">
-                                  {formData.condiciones_asociadas || "Ninguna registrada"}
-                                </strong>
+                                <h6 className="text-info mb-3">Historial Médico</h6>
+                                <small className="text-muted d-block mb-2">Enfermedades Crónicas</small>
+                                <strong className="text-dark d-block">{formData.enfermedades_cronicas || "Ninguna registrada"}</strong>
+                                <small className="text-muted d-block mt-3 mb-2">Antecedentes Familiares</small>
+                                <strong className="text-dark d-block">{formData.antecedentes_familiares || "No especificados"}</strong>
+                                <small className="text-muted d-block mt-3 mb-2">Cirugías Previas</small>
+                                <strong className="text-dark d-block">{formData.cirugias_previas || "Ninguna registrada"}</strong>
+                                <small className="text-muted d-block mt-3 mb-2">Vacunas</small>
+                                <strong className="text-dark d-block">{formData.vacunas || "No especificadas"}</strong>
                               </div>
                             </div>
                           </div>
@@ -709,18 +755,44 @@ const PatientProfileCompletion = () => {
                       <div className="col-md-8">
                         <h5 className="text-dark mb-3">Información de Contacto</h5>
                         <div className="row g-3">
-                          <div className="col-12">
-                            <div className="border rounded p-3 bg-light">
-                              <small className="text-muted d-block">Teléfono</small>
-                              <strong className="text-dark">{formData.telefono || "No especificado"}</strong>
+                          {rol === "paciente" ? (
+                            <>
+                              {/* Información de contacto personal - Paciente */}
+                              <div className="col-md-6">
+                                <div className="border rounded p-3 bg-light h-100">
+                                  <h6 className="text-primary mb-3">Contacto Personal</h6>
+                                  <small className="text-muted d-block mb-2">Teléfono</small>
+                                  <strong className="text-dark d-block">{formData.telefono || "No especificado"}</strong>
+                                  <small className="text-muted d-block mt-3 mb-2">Dirección</small>
+                                  <strong className="text-dark d-block">{formData.direccion || "No especificada"}</strong>
+                                </div>
+                              </div>
+                              
+                              {/* Información de contacto de emergencia - Solo Paciente */}
+                              <div className="col-md-6">
+                                <div className="border rounded p-3 bg-light h-100">
+                                  <h6 className="text-danger mb-3">Contacto de Emergencia</h6>
+                                  <small className="text-muted d-block mb-2">Nombre del Contacto</small>
+                                  <strong className="text-dark d-block">{formData.contacto_emergencia || "No especificado"}</strong>
+                                  <small className="text-muted d-block mt-3 mb-2">Relación</small>
+                                  <strong className="text-dark d-block">{formData.relacion_contacto_emergencia || "No especificada"}</strong>
+                                  <small className="text-muted d-block mt-3 mb-2">Teléfono de Emergencia</small>
+                                  <strong className="text-dark d-block">{formData.telefono_emergencia || "No especificado"}</strong>
+                                </div>
+                              </div>
+                            </>
+                          ) : (
+                            // Vista de contacto para Doctor
+                            <div className="col-12">
+                              <div className="border rounded p-3 bg-light">
+                                <h6 className="text-primary mb-3">Datos de Contacto Profesional</h6>
+                                <small className="text-muted d-block mb-2">Teléfono</small>
+                                <strong className="text-dark d-block">{formData.telefono || "No especificado"}</strong>
+                                <small className="text-muted d-block mt-3 mb-2">Dirección Profesional</small>
+                                <strong className="text-dark d-block">{formData.direccion || "No especificada"}</strong>
+                              </div>
                             </div>
-                          </div>
-                          <div className="col-12">
-                            <div className="border rounded p-3 bg-light">
-                              <small className="text-muted d-block">Dirección</small>
-                              <strong className="text-dark">{formData.direccion || "No especificada"}</strong>
-                            </div>
-                          </div>
+                          )}
                         </div>
                       </div>
                       <div className="col-md-4">
@@ -859,7 +931,7 @@ const PatientProfileCompletion = () => {
                     <Form.Control
                       type="number"
                       name="peso_kg"
-                      value={formData.peso_kg}
+                      value={formData.peso_kg === "" ? "" : Number(formData.peso_kg)}
                       onChange={handleInputChange}
                       placeholder="70"
                       step="0.1"
@@ -873,7 +945,7 @@ const PatientProfileCompletion = () => {
                     <Form.Control
                       type="number"
                       name="estatura_cm"
-                      value={formData.estatura_cm}
+                      value={formData.estatura_cm === "" ? "" : Number(formData.estatura_cm)}
                       onChange={handleInputChange}
                       placeholder="170"
                       min="50"
@@ -910,30 +982,93 @@ const PatientProfileCompletion = () => {
         <Modal.Body>
           <Form onSubmit={(e) => handleSubmit(e, "contact")}>
             <div className="row">
+              {/* Información de contacto */}
               <div className="col-12">
-                <Form.Group className="mb-3">
-                  <Form.Label>Teléfono</Form.Label>
-                  <Form.Control
-                    type="tel"
-                    name="telefono"
-                    value={formData.telefono}
-                    onChange={handleInputChange}
-                    placeholder="+52 33 1234 5678"
-                  />
-                </Form.Group>
-              </div>
-              <div className="col-12">
-                <Form.Group className="mb-3">
-                  <Form.Label>Dirección</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={3}
-                    name="direccion"
-                    value={formData.direccion}
-                    onChange={handleInputChange}
-                    placeholder="Calle, número, colonia, ciudad, código postal..."
-                  />
-                </Form.Group>
+                {rol === "paciente" ? (
+                  <>
+                    <h6 className="text-primary mb-3">Contacto Personal</h6>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Teléfono</Form.Label>
+                      <Form.Control
+                        type="tel"
+                        name="telefono"
+                        value={formData.telefono}
+                        onChange={handleInputChange}
+                        placeholder="+52 33 1234 5678"
+                      />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Dirección</Form.Label>
+                      <Form.Control
+                        as="textarea"
+                        rows={3}
+                        name="direccion"
+                        value={formData.direccion}
+                        onChange={handleInputChange}
+                        placeholder="Calle, número, colonia, ciudad, código postal..."
+                      />
+                    </Form.Group>
+
+                    {/* Información de contacto de emergencia - solo para pacientes */}
+                    <hr className="my-4" />
+                    <h6 className="text-danger mb-3">Contacto de Emergencia</h6>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Nombre del Contacto de Emergencia</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="contacto_emergencia"
+                        value={formData.contacto_emergencia}
+                        onChange={handleInputChange}
+                        placeholder="Nombre completo del contacto de emergencia"
+                      />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Relación con el Contacto</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="relacion_contacto_emergencia"
+                        value={formData.relacion_contacto_emergencia}
+                        onChange={handleInputChange}
+                        placeholder="Ej: Padre, Madre, Hijo/a, Cónyuge..."
+                      />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Teléfono de Emergencia</Form.Label>
+                      <Form.Control
+                        type="tel"
+                        name="telefono_emergencia"
+                        value={formData.telefono_emergencia}
+                        onChange={handleInputChange}
+                        placeholder="+52 33 1234 5678"
+                      />
+                    </Form.Group>
+                  </>
+                ) : (
+                  <>
+                    <h6 className="text-primary mb-3">Información de Contacto</h6>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Teléfono</Form.Label>
+                      <Form.Control
+                        type="tel"
+                        name="telefono"
+                        value={formData.telefono}
+                        onChange={handleInputChange}
+                        placeholder="+52 33 1234 5678"
+                      />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Dirección</Form.Label>
+                      <Form.Control
+                        as="textarea"
+                        rows={3}
+                        name="direccion"
+                        value={formData.direccion}
+                        onChange={handleInputChange}
+                        placeholder="Calle, número, colonia, ciudad, código postal..."
+                      />
+                    </Form.Group>
+                  </>
+                )}
               </div>
             </div>
           </Form>
@@ -957,6 +1092,7 @@ const PatientProfileCompletion = () => {
           <Modal.Body>
             <Form onSubmit={(e) => handleSubmit(e, "medical")}>
               <div className="row">
+                {/* Datos médicos básicos */}
                 <div className="col-md-6">
                   <Form.Group className="mb-3">
                     <Form.Label>Tipo de Sangre</Form.Label>
@@ -973,32 +1109,86 @@ const PatientProfileCompletion = () => {
                     </Form.Select>
                   </Form.Group>
                 </div>
+
+                {/* Alergias y medicamentos */}
                 <div className="col-12">
+                  <hr className="my-4" />
+                  <h6 className="text-danger mb-3">Alergias y Medicamentos</h6>
                   <Form.Group className="mb-3">
-                    <Form.Label>Diagnóstico Principal</Form.Label>
+                    <Form.Label>Alergias</Form.Label>
                     <Form.Control
                       as="textarea"
-                      rows={3}
-                      name="diagnostico_principal"
-                      value={formData.diagnostico_principal}
+                      rows={2}
+                      name="alergias"
+                      value={formData.alergias}
                       onChange={handleInputChange}
-                      placeholder="Describa el diagnóstico principal..."
+                      placeholder="Describa alergias a medicamentos, alimentos, etc..."
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Medicamentos Actuales</Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      rows={2}
+                      name="medicamentos_actuales"
+                      value={formData.medicamentos_actuales}
+                      onChange={handleInputChange}
+                      placeholder="Liste los medicamentos que toma actualmente..."
                     />
                   </Form.Group>
                 </div>
+
+                {/* Historial médico */}
                 <div className="col-12">
+                  <hr className="my-4" />
+                  <h6 className="text-info mb-3">Historial Médico</h6>
                   <Form.Group className="mb-3">
-                    <Form.Label>Condiciones Asociadas</Form.Label>
+                    <Form.Label>Enfermedades Crónicas</Form.Label>
                     <Form.Control
                       as="textarea"
-                      rows={3}
-                      name="condiciones_asociadas"
-                      value={formData.condiciones_asociadas}
+                      rows={2}
+                      name="enfermedades_cronicas"
+                      value={formData.enfermedades_cronicas}
                       onChange={handleInputChange}
-                      placeholder="Describa condiciones médicas asociadas..."
+                      placeholder="Liste enfermedades crónicas..."
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Antecedentes Familiares</Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      rows={2}
+                      name="antecedentes_familiares"
+                      value={formData.antecedentes_familiares}
+                      onChange={handleInputChange}
+                      placeholder="Describa enfermedades importantes en su familia..."
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Cirugías Previas</Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      rows={2}
+                      name="cirugias_previas"
+                      value={formData.cirugias_previas}
+                      onChange={handleInputChange}
+                      placeholder="Liste cirugías anteriores y fechas..."
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Vacunas</Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      rows={2}
+                      name="vacunas"
+                      value={formData.vacunas}
+                      onChange={handleInputChange}
+                      placeholder="Liste sus vacunas y fechas de aplicación..."
                     />
                   </Form.Group>
                 </div>
+
+
               </div>
             </Form>
           </Modal.Body>

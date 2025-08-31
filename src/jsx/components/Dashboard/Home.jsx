@@ -10,6 +10,7 @@ import {
   FaStethoscope,
   FaEye,
   FaEllipsisV,
+  FaCalendar
 } from "react-icons/fa";
 
 import "./dashboardCss/Dashboard.css";
@@ -174,7 +175,17 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="stat-number">{stats.activePatients}</div>
-          <div className="stat-label">Pacientes Activos</div>
+          <div className="stat-label">corregir cantidad de pacientes</div>
+        </div>
+
+        <div className="stat-card" onClick={() => navigate("/Mis-Pacientes")}>
+          <div className="stat-header">
+            <div className="stat-icon">
+              <FaCalendar />
+            </div>
+          </div>
+          <div className="stat-number">5</div>
+          <div className="stat-label">Citas pendientes</div>
         </div>
 
         <div

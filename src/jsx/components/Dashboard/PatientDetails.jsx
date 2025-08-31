@@ -17,7 +17,7 @@ import {
 
 import { Dropdown, Spinner, Card, Badge, Row, Col } from "react-bootstrap";
 
-import PendingAppointments from "../AppsMenu/Calendar/PendingAppointments";
+import PersonalRecommendations from "./PersonalRecommendations";
 
 import { useAuthUser } from '../../../services/CurrentAuth';
 
@@ -232,7 +232,7 @@ useEffect(() => {
   const [patientData, setPatientData] = useState({
     nombre: '—',
     fecha_registro: '—',
-    doctor_asignado: { nombre: '—' }, // por ahora deja UID si llega
+    doctor_asignado: { doctorName: '—' }, // por ahora deja UID si llega
     datos_personales: {
       edad: '—',
       sexo: '—',
@@ -340,8 +340,8 @@ useEffect(() => {
           '—';
 
         const doctorDisplay =
-          pick(analysisDoc0 || {}, ['doctorUid', 'doctor_uid', 'doctor']) ||
-          pick(patientDoc || {}, ['doctorUid', 'doctor_uid', 'doctor']) ||
+          pick(analysisDoc0 || {}, ['doctorName', 'doctor_uid', 'doctor']) ||
+          pick(patientDoc || {}, ['doctorName', 'doctor_uid', 'doctor']) ||
           pick(patientDoc || {}, ['doctor_asignado.nombre', 'doctor_nombre']) ||
           pick(analysisDoc0 || {}, ['doctorNombre']) ||
           '—';
@@ -608,6 +608,17 @@ useEffect(() => {
     const found = analyses.find((a) => a.id === (selectedId || ''));
     return found?.label || 'Último';
   }, [analyses, selectedId]);
+
+  const selectedAnalysisTimestamp = useMemo(() => {
+    // Reusa la misma heurística de fechas que ya empleas para etiquetas:
+    const d =
+      toDateObj(rawAnalysisDoc?.createdAt) ||
+      toDateObj(rawAnalysisDoc?.creadoEn) ||
+      toDateObj(rawAnalysisDoc?.timestamp) ||
+      toDateObj(rawAnalysisDoc?.footPressure?.timestamp) ||
+      toDateObj(rawAnalysisDoc?.posture?.timestamp);
+    return d ? d.getTime() : null;
+  }, [rawAnalysisDoc]);
 
   // ================== Secciones ==================
   const renderGeneralTab = () => (
@@ -1200,16 +1211,24 @@ useEffect(() => {
   );
 
   const renderAppointmentsTab = () => (
-    <div className="">
-      {/* Completo */}
-      <div className="d-flex flex-column gap-4">
-        <div className="card">
-          <div className="card-header">
-            <h2>Citas</h2>
-          </div>
-          <div className="card-body">
-            <PendingAppointments />
-          </div>
+    <div className="d-flex flex-column gap-4">
+      <div className="card">
+
+        <div className="card-body">
+          {/* 🔗 PASAMOS los IDs resueltos, para que cargue ese análisis específico */}
+        <PersonalRecommendations
+          patientId={patientId}
+          analysisId={selectedId}
+          analysisTimestamp={
+            // usa el mismo heurístico de fechas que ya usas para labels
+            (toDateObj(rawAnalysisDoc?.createdAt) ||
+            toDateObj(rawAnalysisDoc?.creadoEn) ||
+            toDateObj(rawAnalysisDoc?.timestamp) ||
+            toDateObj(rawAnalysisDoc?.footPressure?.timestamp) ||
+            toDateObj(rawAnalysisDoc?.posture?.timestamp))?.getTime?.() ?? null
+          }
+          readOnly={!(String(rol || "").toLowerCase().match(/doctor|m[eé]dico/))}
+        />
         </div>
       </div>
     </div>
@@ -1319,7 +1338,7 @@ useEffect(() => {
                 <TrendingUp size={16} className="me-1" /> Evolución
               </button>
               <button className={`nav-link ${activeTab === 'appointments' ? 'active' : ''}`} onClick={() => setActiveTab('appointments')}>
-                <Calendar size={16} className="me-1" /> Citas
+                <Calendar size={16} className="me-1" /> Recomendaciones
               </button>
             </nav>
           </div>

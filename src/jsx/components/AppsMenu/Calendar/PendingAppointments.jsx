@@ -126,7 +126,7 @@ const PendingAppointments = () => {
         <div className="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-3 flex-shrink-0">
           {/* Buscador */}
           <div className="position-relative" style={{ minWidth: "250px" }}>
-            <Search className="position-absolute top-50 translate-middle-y ms-3" style={{ width: "16px", height: "16px", color: "#6c757d", zIndex: 10 }} />
+            <Search className="position-absolute top-50 translate-middle-y ms-3" style={{ width: "16px", height: "16px", color: "#6c757d", zIndex: 1 }} />
             <input
               type="text"
               className="form-control form-control-sm ps-5 pe-3"

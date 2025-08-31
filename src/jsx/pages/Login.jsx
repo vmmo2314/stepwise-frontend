@@ -40,7 +40,6 @@ function Login (props) {
 	
 
   return (
-  
 		<div className="login-form-bx">
 			<div className="container-fluid">
 				<div className="row">
@@ -48,10 +47,9 @@ function Login (props) {
 						<div className="authincation-content">
 							<Link to="#" className="login-logo">
 								<img src={logo} alt="" className="logo-icon me-2"/>
-								<img src={logotext} alt="" className="logo-text ms-1"/>
 							</Link>
 							<div className="mb-4">
-								<h3 className="mb-1 font-w600">Bienvenido a(nombre pendiente)</h3>
+								<h1 className="mb-1 font-w600">¡Hola!</h1>
 								<p className="">Inicia sesión con tus credenciales</p>
 							</div>
 							{props.errorMessage && (

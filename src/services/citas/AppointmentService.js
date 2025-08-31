@@ -42,11 +42,21 @@ export const getMyAppointments = async (clinicaId, status = "all") => {
   }
 };
 
-export const acceptAppointment = async ({ appointmentId, doctorNotes = "" }) => {
+export const acceptAppointment = async ({
+  appointmentId,
+  doctorNotes = "",
+  doctorId,         // ⬅️ nuevo
+  doctorName,       // ⬅️ nuevo (requerido por el backend)
+}) => {
   try {
-    const { data } = await axiosInstance.patch(`/api/appointments/${appointmentId}/accept`, {
-      doctorNotes
-    });
+    const { data } = await axiosInstance.patch(
+      `/api/appointments/${appointmentId}/accept`,
+      {
+        doctorNotes,
+        doctorId: doctorId ?? null,     // si tu backend no lo pide, lo ignora
+        doctorName,                     // ⬅️ obligatorio para evitar el 400
+      }
+    );
     return data;
   } catch (error) {
     console.error("AppointmentService.acceptAppointment:", error);
